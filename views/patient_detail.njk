@@ -1,0 +1,26 @@
+{% extends "base.njk" %}
+{% block titulo %}Patient {{ patient.insuranceNumber }}{% endblock %}
+{% block contenido %}
+    <h1 class="text-center my-4 text-primary">{{ patient.surname }}, {{ patient.name }}</h1>
+
+    <div class="container">
+        <div class="card shadow-lg border-light" style="border-radius: 15px; overflow: hidden; background: linear-gradient(to right, #f8f9fa, #e9ecef);">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h6 class="card-title text-dark fw-bold" style="font-size: 1.75rem;">Insurace number: {{ patient.insuranceNumber }}</h6>
+                        <p class="card-text mt-2">
+                            <strong class="text-muted">Birth date:</strong>
+                            <span class="text-dark">{{ patient.birthDate }}</span></p>
+                        <p class="card-text">
+                            <strong class="text-muted">Address:</strong>
+                            <span class="text-success">{{ patient.address }}</span></p>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/patients" class="btn btn-primary" style="margin-right: 10px;">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

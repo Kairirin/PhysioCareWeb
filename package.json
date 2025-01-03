@@ -1,26 +1,26 @@
 {
   "name": "physiocare",
   "version": "1.0.0",
-  "description": "Práctica 1 Despliegue de aplicaciones (2º DAW)",
+  "description": "Práctica 2 Despliegue de aplicaciones (2º DAW)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kairirin/physiocare.git"
+    "url": "git+https://github.com/Kairirin/PhysioCareWeb.git"
   },
   "author": "Irene Vinader Antón",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Kairirin/physiocare/issues"
+    "url": "https://github.com/Kairirin/PhysioCareWeb/issues"
   },
-  "homepage": "https://github.com/Kairirin/physiocare#readme",
+  "homepage": "https://github.com/Kairirin/PhysioCareWeb#readme",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.7.1"
+    "mongoose": "^8.7.1",
+    "nunjucks": "^3.2.4"
   }
 }

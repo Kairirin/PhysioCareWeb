@@ -1,0 +1,74 @@
+{% extends "base.njk" %}
+{% block titulo %}Record
+    {{ record.patient.insuranceNumber }}
+{% endblock %}
+{% block contenido %}
+    <h1 class="text-center my-4 text-primary">Record details</h1>
+    <div class="container">
+        <div class="card shadow-lg border-light" style="border-radius: 15px; overflow: hidden; background: linear-gradient(to right, #f8f9fa, #e9ecef);">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h6 class="card-title text-dark fw-bold" style="font-size: 1.75rem;">Patient:
+                            {{ record.patient.surname }},
+                            {{ record.patient.name }}</h6>
+                        <p class="card-text">
+                            <strong class="text-muted">Insurance number:</strong>
+                            <span class="text-success">{{ record.patient.insuranceNumber }}</span>
+                        </p>
+                        <p class="card-text">
+                            <strong class="text-muted">Birth date:</strong>
+                            <span class="text-success">{{ record.patient.birthDate }}</span>
+                        </p>
+                        <p class="card-text">
+                            <strong class="text-muted">Address:</strong>
+                            <span class="text-success">{{ record.patient.address }}</span>
+                        </p>
+                        <p class="card-text">
+                            <strong class="text-muted">Medical record:</strong>
+                            <span class="text-success">{{ record.medicalRecord }}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title text-dark fw-bold" style="font-size: 1.75rem;">Appointments</h6>
+                    {% for appointment in record.appointments %}
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <strong class="text-muted">Date:</strong>
+                                    <span class="text-success">{{ appointment.date }}</span>
+                                </p>
+                                <p class="card-text">
+                                    <strong class="text-muted">Physio:</strong>
+                                    <span class="text-success">{{ appointment.physio }}</span>
+                                </p>
+                                <p class="card-text">
+                                    <strong class="text-muted">Diagnosis:</strong>
+                                    <span class="text-success">{{ appointment.diagnosis }}</span>
+                                </p>
+                                <p class="card-text">
+                                    <strong class="text-muted">Treatment:</strong>
+                                    <span class="text-success">{{ appointment.treatment }}</span>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <p class="card-text">
+                                    <strong class="text-muted">Observations:</strong>
+                                    <span class="text-success">{{ appointment.observations }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="card-text">
+                            <strong class="text-muted">There is not any appointment</strong>
+                        </p>
+                    {% endfor %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/records" class="btn btn-primary" style="margin-right: 10px;">Return</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

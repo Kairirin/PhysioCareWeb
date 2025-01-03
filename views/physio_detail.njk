@@ -1,0 +1,23 @@
+{% extends "base.njk" %}
+{% block titulo %}Physio {{ physio.licenseNumber }}{% endblock %}
+{% block contenido %}
+    <h1 class="text-center my-4 text-primary">{{ physio.surname }}, {{ physio.name }}</h1>
+
+    <div class="container">
+        <div class="card shadow-lg border-light" style="border-radius: 15px; overflow: hidden; background: linear-gradient(to right, #f8f9fa, #e9ecef);">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h6 class="card-title text-dark fw-bold" style="font-size: 1.75rem;">License number: {{ physio.licenseNumber }}</h6>
+                        <p class="card-text">
+                            <strong class="text-muted">Specialty:</strong>
+                            <span class="text-success">{{ physio.specialty }}</span></p>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/physios" class="btn btn-primary" style="margin-right: 10px;">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

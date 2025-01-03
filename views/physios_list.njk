@@ -1,0 +1,34 @@
+{% extends "base.njk" %}
+{% block titulo %}Physios | List{% endblock %}
+{% block contenido %}
+    <h1>PhysioCare physios</h1>
+
+    <div class="container">
+        <table class="table table-hover table-bordered align-middle shadow-sm" style="border-radius: 10px; overflow: hidden;">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th>License number</th>
+                    <th>Surname, Name</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for physio in physios %}
+                    <tr style="background-color: {% if loop.index % 2 == 0 %}#f8f9fa{% else %}#e9ecef{% endif %};">
+                        <td> {{ physio.licenseNumber }}</td>
+                        <td>{{ physio.surname }}, {{ physio.name }}</td>
+                        <td class="text-center">
+                            <a href="/physios/{{ physio.id }}" class="btn btn-outline-primary btn-sm">View details</a>
+                            <a href="#" class="btn btn-outline-success btn-sm">Edit</a>
+                            <a href="#" class="btn btn-outline-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">There is no any physio to show</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

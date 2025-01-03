@@ -1,0 +1,35 @@
+{% extends "base.njk" %}
+{% block titulo %}Patients | List{% endblock %}
+{% block contenido %}
+    <h1>PhysioCare patients</h1>
+
+    <div class="container">
+        <table class="table table-hover table-bordered align-middle shadow-sm" style="border-radius: 10px; overflow: hidden;">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th>Insurance number</th>
+                    <th>Surname, Name</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                    <tr style="background-color: {% if loop.index % 2 == 0 %}#f8f9fa{% else %}#e9ecef{% endif %};">
+                        <td> {{ patient.insuranceNumber }}</td>
+                        <td>{{ patient.surname }}, {{ patient.name }}</td>
+                        <td class="text-center">
+                            <a href="/patients/{{ patient.id }}" class="btn btn-outline-primary btn-sm">View details</a>
+                            <a href="#" class="btn btn-outline-success btn-sm">Edit</a>
+                            <a href="#" class="btn btn-outline-danger btn-sm">Delete</a>
+                            <a href="#" class="btn btn-outline-success btn-sm">Add record</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">There is no any patient to show</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

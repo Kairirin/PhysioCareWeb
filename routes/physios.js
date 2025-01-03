@@ -2,55 +2,53 @@ const express = require("express");
 const bcrypt = require('bcrypt');
 let Physio = require(__dirname + "/../models/physio.js");
 let User = require(__dirname + "/../models/users.js");
-const { protegerRuta } = require("../auth/auth");
-
 
 let router = express.Router();
 
 //GET
-router.get("/", protegerRuta(["admin", "physio", "patient"]), (req, res) => {
+router.get("/", (req, res) => {
   Physio.find()
     .then((result) => {
       if (result) 
-        res.status(200).send({ result: result });
+        res.render('physios_list', { physios: result });
       else 
-        res.status(404).send({ error: "No hay fisios en el sistema" });
+      res.render('error', { error: 'No hay fisios en el sistema'});
     })
     .catch((error) => {
-      res.status(500).send({ error: "Internal server error" });
+      res.render('error', { error: 'Internal Server Error'});
     });
 });
 
 //GET ESPECIALIDAD
-router.get("/find", protegerRuta(["admin", "physio", "patient"]), (req, res) => {
+router.get("/find", (req, res) => {
   Physio.find({ specialty: req.query.specialty })
     .then((result) => {
       if (result) 
-        res.status(200).send({ result: result });
+        res.render('physios_list', { physios: result });
        else 
-        res.status(404).send({ error: "No se han encontrado fisios con esos criterios" });
+       res.render('error', { error: 'No se han encontrado fisios con esos criterios'});
     })
     .catch((error) => {
-      res.status(500).send({ error: "Internal server error" });
+      res.render('error', { error: 'Internal Server Error'});
     });
 });
 
 //GET ESPECÍFICO
-router.get("/:id", protegerRuta(["admin", "physio", "patient"]), (req, res) => {
+router.get("/:id", (req, res) => {
   Physio.findById(req.params.id)
     .then((result) => {
       if (result)
-        res.status(200).send({ result: result });
+        res.render('physio_detail', { physio: result });
       else 
-        res.status(404).send({ error: "El fisio no se ha encontrado" });
+      res.render('error', { error: 'No se ha encontrado el fisio'});
     })
     .catch((error) => {
-      res.status(500).send({ error: "Internal server error" });
+      res.render('error', { error: 'Internal Server Error'});
     });
 });
 
 //POST FISIO
-router.post("/", protegerRuta(["admin"]), (req, res) => {
+router.post("/", (req, res) => {
   let idUser;
   const saltRounds = 10;
   const hash = bcrypt.hashSync(req.body.password, saltRounds);
@@ -84,7 +82,7 @@ router.post("/", protegerRuta(["admin"]), (req, res) => {
 });
 
 //PUT FISIO
-router.put("/:id", protegerRuta(["admin"]), (req, res) => {
+router.put("/:id", (req, res) => {
   Physio.findByIdAndUpdate(
     req.params.id,
     {
@@ -108,7 +106,7 @@ router.put("/:id", protegerRuta(["admin"]), (req, res) => {
 });
 
 //DELETE FISIO
-router.delete("/:id", protegerRuta(["admin"]), (req, res) => {
+router.delete("/:id", (req, res) => {
   Physio.findByIdAndDelete(req.params.id)
     .then((result) => {
       if (result){

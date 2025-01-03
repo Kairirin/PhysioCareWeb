@@ -1,27 +1,26 @@
 const express = require("express");
 let { Record, Appointment } = require(__dirname + "/../models/record.js");
 let Patient = require(__dirname + "/../models/patient.js");
-const { protegerRuta, accesoId } = require("../auth/auth");
 
 let router = express.Router();
 
 //GET
-router.get("/", protegerRuta(["admin", "physio"]), (req, res) => {
+router.get("/", (req, res) => {
     Record.find()
         .populate("patient")
         .then((result) => {
             if(result)
-                res.status(200).send({ result: result});
+                res.render('records_list', {records: result});
             else 
-                res.status(404).send({ error: "No se encontraron expedientes en el sistema" });
+                res.render('error', { error: "No se encontraron expedientes en el sistema" });
         })
         .catch((error) => {
-            res.status(500).send({ error: "Internal server error"});
+            res.render('error', { error: "Internal server error"});
         });
 });
 
 //GET POR APELLIDO DE PACIENTE
-router.get("/find", protegerRuta(["admin", "physio"]), (req, res) => {
+router.get("/find", (req, res) => {
     Patient.find({ surname: req.query.surname })
         .then(resultadoPaciente => {
             let idPacientes = resultadoPaciente.map(p => p.id);
@@ -29,31 +28,31 @@ router.get("/find", protegerRuta(["admin", "physio"]), (req, res) => {
                 .populate("patient")
                 .then(result => {
                     if(result)
-                        res.status(200).send({ result: result});
+                        res.render('records_list', {records: result});
                     else 
-                        res.status(404).send({ error: "No se encontraron expedientes" });
+                        res.render('error', { error: "No se encontraron expedientes" });
                 })
         }).catch((error) => {
-            res.status(500).send({ error: "Internal server error"});
+            res.render('error', { error: "Internal server error"});
         });
 });
 
 //GET POR ID DE PACIENTE
-router.get("/:id", protegerRuta(["admin", "physio", "patient"]), accesoId() , (req, res) => {
-    Record.find({patient: req.params.id})
+router.get("/:id", (req, res) => {
+    Record.findOne({patient: req.params.id})
         .populate("patient")
         .then(result => {
             if(result)
-                res.status(200).send({ result: result });
+                res.render('record_detail', { record: result });
             else 
-                res.status(404).send({ error: "No se ha encontrado el expediente" });
+                res.render('error', { error: "No se ha encontrado el expediente" });
         }).catch((error) => {
-            res.status(500).send({ error: "Internal server error"});
+            res.render('error', { error: "Internal server error"});
         });
 });
 
 //POST EXPEDIENTE
-router.post("/", protegerRuta(["admin", "physio"]), (req, res) => {
+router.post("/", (req, res) => {
     Patient.findById(req.body.patient)
         .then(result => {
             if(result){
@@ -78,7 +77,7 @@ router.post("/", protegerRuta(["admin", "physio"]), (req, res) => {
   });
 
 //AÑADIR CONSULTAS A UN EXPEDIENTE (POR ID PACIENTE)
-router.post('/:id/appointments', protegerRuta(["admin", "physio"]), (req, res) => {
+router.post('/:id/appointments', (req, res) => {
     let appointment = new Appointment ({
         /* date: new Date(req.body.date), */
         date: req.body.date,
@@ -103,7 +102,7 @@ router.post('/:id/appointments', protegerRuta(["admin", "physio"]), (req, res) =
 })
 
 //DELETE (POR ID PACIENTE)
-router.delete("/:id", protegerRuta(["admin", "physio"]), (req, res) => {
+router.delete("/:id", (req, res) => {
     Record.findOneAndDelete({patient: req.params.id})
     .populate("patient")
       .then((result) => {

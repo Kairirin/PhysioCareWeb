@@ -1,59 +1,54 @@
 const express = require("express");
 const bcrypt = require('bcrypt');
-const { protegerRuta, accesoId } = require("../auth/auth");
 let User = require(__dirname + "/../models/users.js");
 let Patient = require(__dirname + "/../models/patient.js");
 
 let router = express.Router();
 
 //GET
-router.get("/", protegerRuta(["admin", "physio"]), (req, res) => {
+router.get("/", (req, res) => {
   Patient.find()
     .then((result) => {
-      if (result) res.status(200).send({ result: result });
+      if (result) res.render('patients_list', { patients: result });
       else
-        res
-          .status(404)
-          .send({ error: "No se ha encontrado el paciente" });
+        res.render('error', { error: 'No se han encontrado pacientes'});
     })
     .catch((error) => {
-      res.status(500).send({ error: "Internal server error" });
+      res.render('error', { error: 'Internal Server Error'});
     });
 });
 
 //GET APELLIDOS
-router.get("/find", protegerRuta(["admin", "physio"]), (req, res) => {
+router.get("/find", (req, res) => {
   Patient.find({
     surname: { $regex: req.query.surname, $options: "i" },
   })
     .then((result) => {
-      if (result) res.status(200).send({ result: result });
+      if (result) res.render('patients_list', { patients: result });
       else
-        res.status(404).send({ error: "No se han encontrado pacientes con esos criterios" });
+        res.render('error', { error: 'No se han encontrado pacientes con esos criterios'});
     })
     .catch((error) => {
-      res.status(500).send({ error: error });
+      res.render('error', { error: 'Internal Server Error'});
     });
 });
 
 //GET ESPECÍFICO
-router.get("/:id", protegerRuta(["admin", "physio", "patient"]), accesoId(),(req, res) => {
+router.get("/:id", (req, res) => {
     Patient.findById(req.params.id)
       .then((result) => {
-        if (result) res.status(200).send({ result: result });
+        if (result) res.render('patient_detail', { patient: result });
         else
-          res
-            .status(404)
-            .send({ error: "No se ha encontrado el paciente" });
+        res.render('error', { error: 'No se ha encontrado el paciente'});
       })
       .catch((error) => {
-        res.status(500).send({ error: "Internal server error" });
+        res.render('error', { error: 'Internal Server Error'});
       });
   }
 );
 
 //POST PACIENTE
-router.post("/", protegerRuta(["admin", "physio"]), (req, res) => {
+router.post("/", (req, res) => {
   let idUser;
   const saltRounds = 10;
   const hash = bcrypt.hashSync(req.body.password, saltRounds);
@@ -91,7 +86,7 @@ router.post("/", protegerRuta(["admin", "physio"]), (req, res) => {
 });
 
 //PUT PACIENTE
-router.put("/:id", protegerRuta(["admin", "physio"]), (req, res) => {
+router.put("/:id", (req, res) => {
   Patient.findByIdAndUpdate(
     req.params.id,
     {
@@ -117,7 +112,7 @@ router.put("/:id", protegerRuta(["admin", "physio"]), (req, res) => {
 });
 
 //DELETE PATIENT
-router.delete("/:id", protegerRuta(["admin", "physio"]), (req, res) => {
+router.delete("/:id", (req, res) => {
   Patient.findByIdAndDelete(req.params.id)
     .then((result) => {
       if (result){
