@@ -2,7 +2,10 @@
 {% block titulo %}Patients | List{% endblock %}
 {% block contenido %}
     <h1>PhysioCare patients</h1>
-
+    <div class="container">
+        {% include "patients_search.njk" %}
+    </div>
+    <br>
     <div class="container">
         <table class="table table-hover table-bordered align-middle shadow-sm" style="border-radius: 10px; overflow: hidden;">
             <thead class="bg-primary text-white">
@@ -15,11 +18,13 @@
             <tbody>
                 {% for patient in patients %}
                     <tr style="background-color: {% if loop.index % 2 == 0 %}#f8f9fa{% else %}#e9ecef{% endif %};">
-                        <td> {{ patient.insuranceNumber }}</td>
-                        <td>{{ patient.surname }}, {{ patient.name }}</td>
+                        <td>
+                            {{ patient.insuranceNumber }}</td>
+                        <td>{{ patient.surname }},
+                            {{ patient.name }}</td>
                         <td class="text-center">
                             <a href="/patients/{{ patient.id }}" class="btn btn-outline-primary btn-sm">View details</a>
-                            <a href="#" class="btn btn-outline-success btn-sm">Edit</a>
+                            <a href="/patients/{{ patient.id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
                             <a href="#" class="btn btn-outline-danger btn-sm">Delete</a>
                             <a href="#" class="btn btn-outline-success btn-sm">Add record</a>
                         </td>

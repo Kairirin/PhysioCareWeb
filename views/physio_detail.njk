@@ -6,6 +6,16 @@
     <div class="container">
         <div class="card shadow-lg border-light" style="border-radius: 15px; overflow: hidden; background: linear-gradient(to right, #f8f9fa, #e9ecef);">
             <div class="row g-0">
+                        <div class="col-md-4">
+                    {% if physio.image %}
+                        <img src="/public/uploads/{{ physio.image }}" class="img-fluid" alt="{{ physio.image }}'s image" style="height: 100%; object-fit: cover; border-top-left-radius: 15px; border-bottom-left-radius: 15px;">
+                    {% else %}
+                        <div class="no-photo d-flex justify-content-center align-items-center flex-column p-4" style="background-color: #f8d7da; border-radius: 15px; border: 2px dashed #f5c6cb; min-height: 200px; color: #721c24;">
+                            <span style="font-size: 50px;">🐱‍👤</span>
+                            <h5 class="mt-3">¡Ups! This physio has no photo</h5>
+                        </div>
+                    {% endif %}
+                </div>
                 <div class="col-md-8">
                     <div class="card-body">
                         <h6 class="card-title text-dark fw-bold" style="font-size: 1.75rem;">License number: {{ physio.licenseNumber }}</h6>
@@ -15,7 +25,7 @@
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <a href="/physios" class="btn btn-primary" style="margin-right: 10px;">Volver al listado</a>
+                    <a href="/physios" class="btn btn-primary" style="margin-right: 10px;">Go back</a>
                 </div>
             </div>
         </div>

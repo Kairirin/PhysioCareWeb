@@ -1,0 +1,95 @@
+{% extends "base.njk" %}
+{% block titulo %}PhysioCare | New patient{% endblock %}
+{% block contenido %}
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4" style="background-color: #f7f1f9;">
+            <h1 class="text-center mb-4" style="color: #6c757d;">New patient</h1>
+            <form action="/patients" method="post" enctype="multipart/form-data">
+                {% if error %}
+                    <div class="alert alert-danger" role="alert" style="background-color: #f8d7da; border-color: #f5c6cb;">
+                        <p class="text-danger">{{ error.general }}</p>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="login" class="text-muted" style="color: #6c757d;">Login:</label>
+                    <input type="text" class="form-control rounded-pill shadow-sm" name="login" id="login">
+                    {% if error.login %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.login }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="text-muted" style="color: #6c757d;">Password:</label>
+                    <input type="password" class="form-control rounded-pill shadow-sm" name="password" id="password">
+                    {% if error.password %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.password }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="name" class="text-muted" style="color: #6c757d;">Name:</label>
+                    <input type="text" class="form-control rounded-pill shadow-sm" name="name" id="name" value="{{ data.name }}">
+                    {% if error.name %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.name }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="surname" class="text-muted" style="color: #6c757d;">Surname:</label>
+                    <input type="text" class="form-control rounded-pill shadow-sm" name="surname" id="surname" value="{{ data.surname }}">
+                    {% if error.surname %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.surname }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate" class="text-muted" style="color: #6c757d;">Birth date:</label>
+                    <input type="date" class="form-control rounded-pill shadow-sm" name="birthdate" id="birthdate" value="{{ data.birthDate }}">
+                    {% if error.birthDate %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.birthDate }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="address" class="text-muted" style="color: #6c757d;">Address:</label>
+                    <input type="text" class="form-control rounded-pill shadow-sm" name="address" id="address" value="{{ data.address }}">
+                    {% if error.address %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.address }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="insurancenumber" class="text-muted" style="color: #6c757d;">Insurance Number:</label>
+                    <input type="text" class="form-control rounded-pill shadow-sm" name="insurancenumber" id="insurancenumber" value="{{ data.insuranceNumber }}">
+                    {% if error.insuranceNumber %}
+                        <div class="mt-2" role="alert">
+                            <p class="text-danger">{{ error.insuranceNumber }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="image" class="text-muted" style="color: #6c757d;">Image:</label>
+                    <input type="file" class="form-control-file" name="image" id="image">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-4 rounded-pill shadow-sm" style="background-color: #b3d0f2; border: none;">
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

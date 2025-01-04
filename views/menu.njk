@@ -1,3 +1,6 @@
-<div class="alert alert-secondary">
-    <a href="#" class="btn btn-dark">Login</a> {# Enlace a servicio de login: "/login" #}
+<div class="alert alert-secondary d-flex gap-3">
+    {% include "patients_search.njk" %}
+    <a href="#" class="btn btn-dark">Login</a>
+    {# Enlace a servicio de login: "/login" #}
+    <a href="/patients/new" class="btn btn-dark">New patient</a>
 </div>

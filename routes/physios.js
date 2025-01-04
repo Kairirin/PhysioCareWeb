@@ -1,9 +1,20 @@
 const express = require("express");
-const bcrypt = require('bcrypt');
+const multer = require('multer');
 let Physio = require(__dirname + "/../models/physio.js");
 let User = require(__dirname + "/../models/users.js");
 
 let router = express.Router();
+
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "_" + file.originalname);
+  },
+});
+
+let upload = multer({ storage: storage });
 
 //GET
 router.get("/", (req, res) => {
@@ -48,15 +59,12 @@ router.get("/:id", (req, res) => {
 });
 
 //POST FISIO
-router.post("/", (req, res) => {
+router.post("/", upload.single('image'), (req, res) => {
   let idUser;
-  const saltRounds = 10;
-  const hash = bcrypt.hashSync(req.body.password, saltRounds);
-
 
   let newUser = new User({
     login: req.body.login,
-    password: hash,
+    password: req.body.password,
     rol: "physio",
   });
 
@@ -82,7 +90,7 @@ router.post("/", (req, res) => {
 });
 
 //PUT FISIO
-router.put("/:id", (req, res) => {
+router.put("/:id", upload.single('image'), (req, res) => {
   Physio.findByIdAndUpdate(
     req.params.id,
     {
