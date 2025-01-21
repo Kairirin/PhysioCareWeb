@@ -2,6 +2,8 @@ const express = require("express");
 const multer = require("multer");
 let Physio = require(__dirname + "/../models/physio.js");
 let User = require(__dirname + "/../models/users.js");
+const { autenticacion, rol } = require(__dirname + '/../auth/auth');
+
 
 let router = express.Router();
 
@@ -17,7 +19,7 @@ let storage = multer.diskStorage({
 let upload = multer({ storage: storage });
 
 //GET
-router.get("/", (req, res) => {
+router.get("/", autenticacion, (req, res) => {
   Physio.find()
     .then((result) => {
       if (result) res.render("physios_list", { physios: result });
@@ -29,12 +31,12 @@ router.get("/", (req, res) => {
 });
 
 //GET FORMULARIO NUEVO FISIO
-router.get("/new", (req, res) => {
+router.get("/new", autenticacion, rol("admin"), (req, res) => {
   res.render("physios_add");
 });
 
 //GET FORMULARIO EDICIÓN FISIO
-router.get("/:id/edit", (req, res) => {
+router.get("/:id/edit", autenticacion, rol("admin"), (req, res) => {
   Physio.findById(req.params.id).then(result => {
     if(result)
         res.render('physio_edit', { physio: result });
@@ -46,7 +48,7 @@ router.get("/:id/edit", (req, res) => {
 });
 
 //GET ESPECIALIDAD
-router.get("/find", (req, res) => {
+router.get("/find", autenticacion, (req, res) => {
   Physio.find({ specialty: req.query.specialty })
     .then((result) => {
       if (result.length > 0) res.render("physios_list", { physios: result });
@@ -61,7 +63,7 @@ router.get("/find", (req, res) => {
 });
 
 //GET ESPECÍFICO
-router.get("/:id", (req, res) => {
+router.get("/:id", autenticacion, (req, res) => {
   Physio.findById(req.params.id)
     .then((result) => {
       if (result) res.render("physio_detail", { physio: result });
@@ -73,7 +75,7 @@ router.get("/:id", (req, res) => {
 });
 
 //POST FISIO
-router.post("/", upload.single("image"), (req, res) => {
+router.post("/", autenticacion, rol("admin"), upload.single("image"), (req, res) => {
   let idUser;
 
   let newUser = new User({
@@ -142,7 +144,7 @@ router.post("/", upload.single("image"), (req, res) => {
 });
 
 //PUT FISIO //TODO: Hace cosas raras
-router.post("/:id", upload.single("image"), (req, res) => {
+router.post("/:id", autenticacion, rol("admin"), upload.single("image"), (req, res) => {
   let newImage;
   if (req.file) {
     newImage = req.file.filename;
@@ -181,7 +183,7 @@ router.post("/:id", upload.single("image"), (req, res) => {
 });
 
 //DELETE FISIO
-router.delete("/:id", (req, res) => {
+router.delete("/:id", autenticacion, rol("admin"), (req, res) => {
   Physio.findByIdAndDelete(req.params.id)
     .then((result) => {
       if (result) {

@@ -2,12 +2,19 @@
     {% include "patients_search.njk" %}
     {% include "physios_search.njk" %}
     {% include "records_search.njk" %}
-    <a href="#" class="btn btn-dark">Login</a>
-    {# Enlace a servicio de login: "/login" #}
-    <a href="/patients/new" class="btn btn-dark">New patient</a>
+    {% if (session and session.login and session.rol == 'admin') %}
+        <a href="/physios/new" class="btn btn-dark">New physio</a>
+    {% endif %}
+    {% if (session and session.login and (session.rol == 'admin' or session.rol == 'physio')) %}
+        <a href="/patients/new" class="btn btn-dark">New patient</a>
+        <a href="/records/new" class="btn btn-dark">New record</a>
+    {% endif %}
+    {% if (session and session.usuario) %}
     <a href="/patients" class="btn btn-dark">Patients</a>
-    <a href="/physios/new" class="btn btn-dark">New physio</a>
     <a href="/physios" class="btn btn-dark">Physios</a>
-    <a href="/records/new" class="btn btn-dark">New record</a>
     <a href="/records" class="btn btn-dark">Records</a>
+    <a class="btn btn-dark" href="/auth/logout">Logout</a>
+    {% else %}
+        <a class="btn btn-dark" href="/auth/login">Login</a>
+    {% endif %}
 </div>

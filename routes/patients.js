@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 let User = require(__dirname + "/../models/users.js");
 let Patient = require(__dirname + "/../models/patient.js");
+const { autenticacion, rol, accesoId } = require(__dirname + '/../auth/auth');
 
 let router = express.Router();
 
@@ -17,7 +18,7 @@ let storage = multer.diskStorage({
 let upload = multer({ storage: storage });
 
 //GET
-router.get("/", (req, res) => {
+router.get("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.find()
     .then((result) => {
       if (result) res.render("patients_list", { patients: result });
@@ -29,7 +30,7 @@ router.get("/", (req, res) => {
 });
 
 //GET APELLIDOS
-router.get("/find", (req, res) => {
+router.get("/find", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.find({
     surname: { $regex: req.query.surname, $options: "i" },
   })
@@ -46,12 +47,12 @@ router.get("/find", (req, res) => {
 });
 
 //GET FORMULARIO NUEVO PACIENTE
-router.get("/new", (req, res) => {
+router.get("/new", autenticacion, rol(["admin", "physio"]), (req, res) => {
   res.render("patient_add");
 });
 
 //GET FORMULARIO EDICIÓN PACIENTE
-router.get("/:id/edit", (req, res) => {
+router.get("/:id/edit", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.findById(req.params.id).then(result => {
     if(result)
         res.render('patient_edit', { patient: result });
@@ -63,7 +64,7 @@ router.get("/:id/edit", (req, res) => {
 });
 
 //GET ESPECÍFICO
-router.get("/:id", (req, res) => {
+router.get("/:id", autenticacion, rol(["admin", "physio", "patient"]), accesoId(), (req, res) => {
   Patient.findById(req.params.id)
     .then((result) => {
       if (result){
@@ -78,7 +79,7 @@ router.get("/:id", (req, res) => {
 });
 
 //POST NUEVO PACIENTE
-router.post("/", upload.single("image"), (req, res) => {
+router.post("/", autenticacion, rol(["admin", "physio"]), upload.single("image"), (req, res) => {
     let idUser;
 
     let newUser = new User({
@@ -150,7 +151,7 @@ router.post("/", upload.single("image"), (req, res) => {
 });
 
 //PUT PACIENTE
-router.post("/:id", upload.single("image"), (req, res) => {
+router.post("/:id", autenticacion, rol(["admin", "physio"]), upload.single("image"), (req, res) => {
   let newImage;
   if (req.file) {
     newImage = req.file.filename;
@@ -193,7 +194,7 @@ router.post("/:id", upload.single("image"), (req, res) => {
 });
 
 //DELETE PATIENT //TODO: Falta implementar todos los borrar
-router.delete("/:id", (req, res) => {
+router.delete("/:id", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.findByIdAndDelete(req.params.id)
     .then((result) => {
       if (result) {

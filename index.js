@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const nunjucks = require('nunjucks');
 const methodOverride = require('method-override');
 
+const auth = require(__dirname + '/routes/auth');
 const patients = require(__dirname + '/routes/patients');
 const physios = require(__dirname + '/routes/physios');
 const records = require(__dirname + '/routes/records');
@@ -42,6 +43,7 @@ app.use(methodOverride(function (req, res) {
   return method;
   }
 }));
+app.use('/auth', auth);
 app.use('/patients', patients);
 app.use('/physios', physios);
 app.use('/records', records);

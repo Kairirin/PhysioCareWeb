@@ -20,6 +20,7 @@
                         <td>{{ physio.surname }}, {{ physio.name }}</td>
                         <td class="text-center">
                             <a href="/physios/{{ physio.id }}" class="btn btn-outline-primary btn-sm">View details</a>
+                            {% if (session and session.login and session.rol == 'admin') %}
                             <a href="/physios/{{ physio.id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
                             <form action="/physios/{{ physio.id }}" method="post">
                                 <input type="hidden" name="_method" value="delete">
@@ -27,6 +28,7 @@
                                 Delete
                                 </button>
                             </form>
+                        {% endif %}
                         </td>
                     </tr>
                 {% else %}

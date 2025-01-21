@@ -2,11 +2,13 @@ const express = require("express");
 let { Record, Appointment } = require(__dirname + "/../models/record.js");
 let Patient = require(__dirname + "/../models/patient.js");
 let Physio = require(__dirname + "/../models/physio.js");
+const { autenticacion, rol, accesoId } = require(__dirname + '/../auth/auth');
+
 
 let router = express.Router();
 
 //GET
-router.get("/", (req, res) => {
+router.get("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
     Record.find()
         .populate("patient")
         .then((result) => {
@@ -21,17 +23,17 @@ router.get("/", (req, res) => {
 });
 
 //GET FORMULARIO NUEVO RECORD
-router.get("/new", (req, res) => {
+router.get("/new", autenticacion, rol(["admin", "physio"]), (req, res) => {
     res.render("record_add");
   });
 
   //GET FORMULARIO NUEVO APPOINTMENT
-router.get("/:id/appointments/new", (req, res) => {
+router.get("/:id/appointments/new", autenticacion, rol(["admin", "physio"]), (req, res) => {
     res.render("record_add_appointment", { id: req.params.id});
   });
 
 //GET POR APELLIDO DE PACIENTE
-router.get("/find", (req, res) => {
+router.get("/find", autenticacion, rol(["admin", "physio"]), (req, res) => {
     Patient.find({ surname: req.query.surname })
         .then(resultadoPaciente => {
             let idPacientes = resultadoPaciente.map(p => p.id);
@@ -49,7 +51,7 @@ router.get("/find", (req, res) => {
 });
 
 //GET POR ID DE PACIENTE
-router.get("/:id", (req, res) => {
+router.get("/:id", autenticacion, rol(["admin", "physio"]), accesoId(), (req, res) => {
     Record.findOne({patient: req.params.id})
         .populate("patient")
         .then(result => {
@@ -63,7 +65,7 @@ router.get("/:id", (req, res) => {
 });
 
 //POST EXPEDIENTE
-router.post("/", (req, res) => {
+router.post("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
     /* Patient.findById(req.body.patient) */
     Patient.findOne({insuranceNumber: req.body.patient })
         .then(result => {
@@ -103,7 +105,7 @@ router.post("/", (req, res) => {
   });
 
 //AÑADIR CONSULTAS A UN EXPEDIENTE (POR ID PACIENTE)
-router.post('/:id/appointments', (req, res) => {
+router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, res) => {
     Physio.findOne({ licenseNumber: req.body.physio})
         .then((result) => {
             let appointment = new Appointment ({
@@ -158,7 +160,7 @@ router.post('/:id/appointments', (req, res) => {
 })
 
 //DELETE (POR ID PACIENTE)
-router.delete("/:id", (req, res) => {
+router.delete("/:id", autenticacion, rol(["admin", "physio"]), (req, res) => {
     Record.findOneAndDelete({patient: req.params.id})
       .then((result) => {
         if (result)
