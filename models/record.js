@@ -3,26 +3,26 @@ const mongoose = require('mongoose');
 let appointmentSchema = new mongoose.Schema({
     date: {
         type: Date,
-        required: true
+        required: [true, 'The date is mandatory']
     },
     physio: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'physios',
-        required: true
+        required: [true, 'The physio is mandatory']
     },
     diagnosis: {
         type: String,
-        required: true,
-        minlength: 10,
-        maxlength: 500
+        required: [true, 'The diagnosis is mandatory'],
+        minlength: [10, 'The min length is 10'],
+        maxlength: [500, 'The max length is 500']
     },
     treatment: {
         type: String,
-        required: true,
+        required: [true, 'The treatment is mandatory']
     },
     observations: {
         type: String,
-        maxlength: 500
+        maxlength: [500, 'The max length is 500']
     }
 });
 
@@ -35,7 +35,7 @@ let recordSchema = new mongoose.Schema({
     },
     medicalRecord: {
         type: String,
-        maxlength: 1000
+        maxlength: [1000, 'The max length is 1000']
     },
     appointments: [appointmentSchema]
 });

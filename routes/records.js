@@ -1,6 +1,7 @@
 const express = require("express");
 let { Record, Appointment } = require(__dirname + "/../models/record.js");
 let Patient = require(__dirname + "/../models/patient.js");
+let Physio = require(__dirname + "/../models/physio.js");
 
 let router = express.Router();
 
@@ -15,9 +16,19 @@ router.get("/", (req, res) => {
                 res.render('error', { error: "No se encontraron expedientes en el sistema" });
         })
         .catch((error) => {
-            res.render('error', { error: "Internal server error"});
+            res.render('error', { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde."});
         });
 });
+
+//GET FORMULARIO NUEVO RECORD
+router.get("/new", (req, res) => {
+    res.render("record_add");
+  });
+
+  //GET FORMULARIO NUEVO APPOINTMENT
+router.get("/:id/appointments/new", (req, res) => {
+    res.render("record_add_appointment", { id: req.params.id});
+  });
 
 //GET POR APELLIDO DE PACIENTE
 router.get("/find", (req, res) => {
@@ -27,13 +38,13 @@ router.get("/find", (req, res) => {
             Record.find({patient: { $in: idPacientes }})
                 .populate("patient")
                 .then(result => {
-                    if(result)
+                    if(result.length > 0)
                         res.render('records_list', {records: result});
                     else 
-                        res.render('error', { error: "No se encontraron expedientes" });
+                        res.render('error', { error: "No se encontraron expedientes asociados al apellido ingresado" });
                 })
         }).catch((error) => {
-            res.render('error', { error: "Internal server error"});
+            res.render('error', { error: "Hubo un problema al procesar la búsqueda. Inténtelo más tarde"});
         });
 });
 
@@ -47,13 +58,14 @@ router.get("/:id", (req, res) => {
             else 
                 res.render('error', { error: "No se ha encontrado el expediente" });
         }).catch((error) => {
-            res.render('error', { error: "Internal server error"});
+            res.render('error', { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde."});
         });
 });
 
 //POST EXPEDIENTE
 router.post("/", (req, res) => {
-    Patient.findById(req.body.patient)
+    /* Patient.findById(req.body.patient) */
+    Patient.findOne({insuranceNumber: req.body.patient })
         .then(result => {
             if(result){
                 let record = new Record({
@@ -61,57 +73,101 @@ router.post("/", (req, res) => {
                     medicalRecord: req.body.medicalRecord,
                     appointments: []
                 });
-                record.save()
-                  .then((result) => {
-                    res.status(201).send({ result: result });
+                record.save().then((result) => {
+                    res.redirect(req.baseUrl);
                   })
                   .catch((error) => {
-                    res.status(400).send({ error: "Error guardando expediente" });
-                  });
+                    let errores = {
+                        general: "Error añadiendo expediente",
+                      };
+            
+                      if (error.errors.patient) {
+                        /* errores.patient = error.errors.patient.message; */
+                        errores.patient = "Debes añadir paciente";
+                      }
+                      if (error.errors.medicalRecord) {
+                        errores.medicalRecord = error.errors.medicalRecord.message;
+                      }
+                      res.render("record_add", { error: errores, data: req.body });
+                    });
             }
-            else
-                res.status(404).send({ error: "No se ha encontrado paciente con esa ID"});
+            else{
+                let errores = {
+                    general: "No se ha encontrado paciente con esa ID",
+                  };
+                res.render("record_add", { error: errores});
+            }
         }).catch(error => {
-            res.status(500).send({ error: "Internal server error" });
+            res.render("error", { error: "Error en la base de datos. Inténtelo de nuevo." });
         })
   });
 
 //AÑADIR CONSULTAS A UN EXPEDIENTE (POR ID PACIENTE)
 router.post('/:id/appointments', (req, res) => {
-    let appointment = new Appointment ({
-        /* date: new Date(req.body.date), */
-        date: req.body.date,
-        physio: req.body.physio,
-        diagnosis: req.body.diagnosis,
-        treatment: req.body.treatment,
-        observations: req.body.observations
-    });
-    //Record.findByIdAndUpdate(req.params.id, 
-    Record.findOneAndUpdate({patient: req.params.id},
-    {
-        $push: {appointments: appointment} }, {new: true}
-    )
-    .then(result => {
-        if (result)
-            res.status(201).send({ result: result });
-        else
-            res.status(404).send({ error: "Fallo en la inserción" })
-    }).catch(error => {
-        res.status(500).send({ error: "Internal server error"});
-    })
+    Physio.findOne({ licenseNumber: req.body.physio})
+        .then((result) => {
+            let appointment = new Appointment ({
+                /* date: new Date(req.body.date), */
+                date: req.body.date,
+                physio: result._id,
+                diagnosis: req.body.diagnosis,
+                treatment: req.body.treatment,
+                observations: req.body.observations
+            });
+        
+            Record.findOneAndUpdate({patient: req.params.id},
+            {
+                $push: {appointments: appointment} 
+            }, { new: true }
+            ).then(result => {
+                if (result)
+                    res.render('record_detail', { record: result });
+                else
+                    res.render("error", { error: "Error en inserción. Inténtelo de nuevo." }); //TODO: Comprobar si sobra
+            }).catch((error) => {
+                let errores = {
+                    general: "Error adding appointment",
+                  };
+            
+                  if (error.errors.date) {
+                    errores.date = error.errors.date.message;
+                  }
+                  
+                  if (error.errors.physio) {
+                    errores.physio = error.errors.physio.message;
+                  }
+
+                  if (error.errors.diagnosis) {
+                    errores.diagnosis = error.errors.diagnosis.message;
+                  }
+                  if (error.errors.treatment) {
+                    errores.treatment = error.errors.treatment.message;
+                  }
+                  if (error.errors.observations) {
+                    errores.observations = error.errors.observations.message;
+                  }
+                  res.render("record_add_appointment", { error: errores, data: req.body }); //TODO: La segunda vez que da error redirige al formulario de añadir y no sé porqué
+                });
+        }).catch(() => {
+            let errores = {
+                general: "Error adding appointment",
+                physio: "El fisio  no existe"
+              };
+            res.render("record_add_appointment", { error: errores, data: req.body });
+        })
 })
 
 //DELETE (POR ID PACIENTE)
 router.delete("/:id", (req, res) => {
     Record.findOneAndDelete({patient: req.params.id})
-    .populate("patient")
       .then((result) => {
-        if (result) res.status(200).send({ result: result });
+        if (result)
+            res.redirect(req.baseUrl);
         else
-          res.status(404).send({  error: "El expediente a eliminar no existe" });
+            res.render('error', {error: "El expediente a eliminar no existe"});
       })
       .catch((error) => {
-        res.status(500).send({ error: "Internal server error" });
+        res.render('error', {error: "Error en el servidor. Inténtalo más tarde"});
       });
   });
 

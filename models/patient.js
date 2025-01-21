@@ -25,7 +25,7 @@ let patientSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Patient\'s insurance number is mandatory'],
         match: [/^[a-zA-Z0-9]{9}$/, 'Patient\'s insurance number may only contain nine letters and/or numbers'],
-        unique: [true, 'Patient\'s insurance number must be unique']
+        unique: true
     },
     image: {
         type: String

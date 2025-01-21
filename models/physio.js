@@ -22,7 +22,7 @@ let physioSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Physio\'s license number is mandatory'],
         match: [/^[a-zA-Z0-9]{8}$/, 'Physio\'s license number may only contain eight letters and/or numbers'],
-        unique: [true, 'Physio\'s insurance number must be unique']
+        unique: true
     },
     image: {
         type: String

@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const nunjucks = require('nunjucks');
 const methodOverride = require('method-override');
@@ -8,6 +9,12 @@ const physios = require(__dirname + '/routes/physios');
 const records = require(__dirname + '/routes/records');
 
 let app = express();
+
+app.use(session({
+  secret: process.env.SECRETO_SESIONES,
+  resave: true,
+  saveUninitialized: false
+  }));
 
 nunjucks.configure('views', {
   autoescape: true,

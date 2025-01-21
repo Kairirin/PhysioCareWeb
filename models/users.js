@@ -5,7 +5,7 @@ let userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Username is mandatory"],
         minlenght: [4, "Username is too short"],
-        unique: [true, "Username must be unique"],
+        unique: true,
     },
     password: {
         type: String,

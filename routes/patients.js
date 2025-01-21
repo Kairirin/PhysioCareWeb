@@ -34,7 +34,7 @@ router.get("/find", (req, res) => {
     surname: { $regex: req.query.surname, $options: "i" },
   })
     .then((result) => {
-      if (result) res.render("patients_list", { patients: result });
+      if (result.length > 0) res.render("patients_list", { patients: result });
       else
         res.render("error", {
           error: "No se encontraron pacientes asociados al apellido ingresado",
@@ -66,7 +66,10 @@ router.get("/:id/edit", (req, res) => {
 router.get("/:id", (req, res) => {
   Patient.findById(req.params.id)
     .then((result) => {
-      if (result) res.render("patient_detail", { patient: result });
+      if (result){
+        const dateAux = result.birthDate.toLocaleDateString('es-ES');
+        res.render("patient_detail", { patient: result, date: dateAux });
+      } 
       else res.render("error", { error: "No se ha encontrado el paciente" });
     })
     .catch((error) => {
@@ -122,16 +125,20 @@ router.post("/", upload.single("image"), (req, res) => {
           if (error.errors.address) {
             errores.address = error.errors.address.message;
           }
-          if (error.errors.insuranceNumber) {
+          if (error.errors.insuranceNumber) { //TODO: manualmente controlar que no se repita
             errores.insuranceNumber = error.errors.insuranceNumber.message;
           }
           res.render("patient_add", { error: errores, data: req.body });
         });
     }).catch((error) => {
+    let username = User.find({ login: req.body.login });
     let errores = {
       general: "Error adding user",
     };
-    if (error.errors.login) {
+    if (username){
+      errores.unique = "This username is already in use";
+    }
+    else if (error.errors.login) { //TODO: Toda esta parte no va.
       errores.login = error.errors.login.message;
     }
     
@@ -144,15 +151,18 @@ router.post("/", upload.single("image"), (req, res) => {
 
 //PUT PACIENTE
 router.post("/:id", upload.single("image"), (req, res) => {
+  let newImage;
+  if (req.file) {
+    newImage = req.file.filename;
+  }
   Patient.findByIdAndUpdate(req.params.id, {
       $set: {
         name: req.body.name,
         surname: req.body.surname,
         birthDate: req.body.birthDate,
-        /* birthDate: new Date(req.body.birthDate), */
         address: req.body.address,
         insuranceNumber: req.body.insuranceNumber,
-        image: req.file.filename
+        image: newImage
       }
     }, { new: true, runValidators: true }
   ).then((result) => {
@@ -176,25 +186,25 @@ router.post("/:id", upload.single("image"), (req, res) => {
         errores.address = error.errors.address.message;
       }
       if (error.errors.insuranceNumber) {
-        errores.insuranceNumber = error.errors.insuranceNumber.message;
+        errores.insuranceNumber = error.errors.insuranceNumber.message; //TODO: manualmente controlar que no se repita
       }
-      res.render("patient_edit", { error: errores, patient: req.body });
+      res.render("patient_edit", { error: errores, patient: req.body }); //TODO: La segunda vez que da error redirige al formulario de añadir y no sé porqué
     });
 });
 
-//DELETE PATIENT
+//DELETE PATIENT //TODO: Falta implementar todos los borrar
 router.delete("/:id", (req, res) => {
   Patient.findByIdAndDelete(req.params.id)
     .then((result) => {
       if (result) {
         User.findByIdAndDelete(req.params.id).then((resultUser) => {
-          res.status(200).send({ result: resultUser });
+          res.redirect(req.baseUrl);
         });
       } else
-        res.status(404).send({ error: "El paciente a eliminar no existe" });
+        res.render('error', {error: "El paciente a eliminar no existe"});
     })
     .catch((error) => {
-      res.status(500).send({ error: "Internal server error" });
+      res.render('error', {error: "El paciente a eliminar no existe"});
     });
 });
 
