@@ -125,7 +125,7 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
                 if (result)
                     res.render('record_detail', { record: result });
                 else
-                    res.render("error", { error: "Error en inserción. Inténtelo de nuevo." }); //TODO: Comprobar si sobra
+                    res.render("error", { error: "Error en inserción. Inténtelo de nuevo." });
             }).catch((error) => {
                 let errores = {
                     general: "Error adding appointment",
@@ -148,7 +148,7 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
                   if (error.errors.observations) {
                     errores.observations = error.errors.observations.message;
                   }
-                  res.render("record_add_appointment", { error: errores, data: req.body }); //TODO: La segunda vez que da error redirige al formulario de añadir y no sé porqué
+                  res.render("record_add_appointment", { error: errores, data: req.body }); //TODO: La segunda vez que da error redirige al formulario de añadir y no sé porqué. Va eliminando cosas de la uri
                 });
         }).catch(() => {
             let errores = {

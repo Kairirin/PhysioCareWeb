@@ -17,6 +17,11 @@ app.use(session({
   saveUninitialized: false
   }));
 
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
+
 nunjucks.configure('views', {
   autoescape: true,
   express: app

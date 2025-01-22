@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
 const multer = require("multer");
 let User = require(__dirname + "/../models/users.js");
 let Patient = require(__dirname + "/../models/patient.js");
@@ -21,8 +22,8 @@ let upload = multer({ storage: storage });
 router.get("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.find()
     .then((result) => {
-      if (result) res.render("patients_list", { patients: result });
-      else res.render("error", { error: "No se han encontrado pacientes" }); //TODO: ARREGLAR QUE CUANDO NO ENCUENTRA PACIENTES NO PASA A LA VISTA DE ERROR, SINO QUE SACA EL LISTADO VACÍO
+      if (result.length > 0) res.render("patients_list", { patients: result });
+      else res.render("error", { error: "No se han encontrado pacientes" }); 
     })
     .catch((error) => {
       res.render("error", { error: "Internal Server Error" });
@@ -54,8 +55,10 @@ router.get("/new", autenticacion, rol(["admin", "physio"]), (req, res) => {
 //GET FORMULARIO EDICIÓN PACIENTE
 router.get("/:id/edit", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.findById(req.params.id).then(result => {
-    if(result)
-        res.render('patient_edit', { patient: result });
+    if(result){
+      const birthDateA = result.birthDate.toLocaleDateString('en-CA'); 
+      res.render('patient_edit', { patient: result, birthDate: birthDateA });
+    }
     else
         res.render('error', { error: "Patient not found" });
   }).catch (error => {
@@ -81,10 +84,12 @@ router.get("/:id", autenticacion, rol(["admin", "physio", "patient"]), accesoId(
 //POST NUEVO PACIENTE
 router.post("/", autenticacion, rol(["admin", "physio"]), upload.single("image"), (req, res) => {
     let idUser;
+    const saltRounds = 10;
+    const hash = bcrypt.hashSync(req.body.password, saltRounds);
 
     let newUser = new User({
       login: req.body.login,
-      password: req.body.password,
+      password: hash,
       rol: "patient",
     });
 
@@ -193,7 +198,7 @@ router.post("/:id", autenticacion, rol(["admin", "physio"]), upload.single("imag
     });
 });
 
-//DELETE PATIENT //TODO: Falta implementar todos los borrar
+//DELETE PATIENT
 router.delete("/:id", autenticacion, rol(["admin", "physio"]), (req, res) => {
   Patient.findByIdAndDelete(req.params.id)
     .then((result) => {

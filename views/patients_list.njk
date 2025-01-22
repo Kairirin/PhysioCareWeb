@@ -1,7 +1,7 @@
 {% extends "base.njk" %}
 {% block titulo %}Patients | List{% endblock %}
 {% block contenido %}
-    <h1>PhysioCare patients</h1>
+    <h1>Patients</h1>
     <div class="container">
         {% include "patients_search.njk" %}
     </div>
@@ -23,15 +23,25 @@
                         <td>{{ patient.surname }},
                             {{ patient.name }}</td>
                         <td class="text-center">
-                            <a href="/patients/{{ patient.id }}" class="btn btn-outline-primary btn-sm">View details</a>
-                            <a href="/patients/{{ patient.id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
-                            <form action="/patients/{{ patient.id }}" method="post">
-                                <input type="hidden" name="_method" value="delete">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                Delete
-                                </button>
-                            </form>
-                            <a href="#" class="btn btn-outline-success btn-sm">Add record</a>
+                            <ul class="nav flex-row justify-content-center">
+                                <li class="nav-item">
+                                    <a href="/patients/{{ patient.id }}" class="btn btn-outline-primary btn-sm">View details</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/patients/{{ patient.id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
+                                </li>
+                                <li class="nav-item">
+                                    <form action="/patients/{{ patient.id }}" method="post">
+                                        <input type="hidden" name="_method" value="delete">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        Delete
+                                        </button>
+                                    </form>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="btn btn-outline-success btn-sm">Add record</a>
+                                </li>
+                            </ul>
                         </td>
                     </tr>
                 {% else %}

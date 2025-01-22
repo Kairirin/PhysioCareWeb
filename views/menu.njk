@@ -1,20 +1,101 @@
-<div class="alert alert-secondary d-flex gap-3">
+{# <div class="alert alert-secondary d-flex gap-3">
     {% include "patients_search.njk" %}
     {% include "physios_search.njk" %}
     {% include "records_search.njk" %}
     {% if (session and session.login and session.rol == 'admin') %}
         <a href="/physios/new" class="btn btn-dark">New physio</a>
     {% endif %}
-    {% if (session and session.login and (session.rol == 'admin' or session.rol == 'physio')) %}
+    {% if (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
         <a href="/patients/new" class="btn btn-dark">New patient</a>
         <a href="/records/new" class="btn btn-dark">New record</a>
     {% endif %}
     {% if (session and session.usuario) %}
-    <a href="/patients" class="btn btn-dark">Patients</a>
-    <a href="/physios" class="btn btn-dark">Physios</a>
-    <a href="/records" class="btn btn-dark">Records</a>
-    <a class="btn btn-dark" href="/auth/logout">Logout</a>
+        <a href="/patients" class="btn btn-dark">Patients</a>
+        <a href="/physios" class="btn btn-dark">Physios</a>
+        <a href="/records" class="btn btn-dark">Records</a>
+        <a class="btn btn-dark" href="/auth/logout">Logout</a>
     {% else %}
         <a class="btn btn-dark" href="/auth/login">Login</a>
     {% endif %}
-</div>
+</div> #}
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">PhysioCare</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/patients" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Patients
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/patients">See list</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% if (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
+                            <li>
+                                <a class="dropdown-item" href="/patients/new">New patient</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/physios" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Physios
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/physios">See list</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% if (session and session.login and session.rol == 'admin') %}
+                            <li>
+                                <a class="dropdown-item" href="/physios/new">New physio</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/records" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Records
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/records">See list</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% if (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
+                            <li>
+                                <a class="dropdown-item" href="/records/new">New record</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% if (session and session.login) %}
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/auth/logout">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    {% include "patients_search.njk" %}
+                </li>
+                <li class="nav-item">
+                    {% include "physios_search.njk" %}
+                </li>
+                <li class="nav-item">
+                    {% include "records_search.njk" %}
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

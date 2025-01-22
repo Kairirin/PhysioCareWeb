@@ -23,9 +23,7 @@
                             <p class="text-danger">{{ error.login }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="password" class="text-muted" style="color: #6c757d;">Password:</label>
                     <input type="password" class="form-control rounded-pill shadow-sm" name="password" id="password">
                     {% if error.password %}
@@ -33,9 +31,7 @@
                             <p class="text-danger">{{ error.password }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="name" class="text-muted" style="color: #6c757d;">Name:</label>
                     <input type="text" class="form-control rounded-pill shadow-sm" name="name" id="name" value="{{ data.name }}">
                     {% if error.name %}
@@ -43,9 +39,7 @@
                             <p class="text-danger">{{ error.name }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="surname" class="text-muted" style="color: #6c757d;">Surname:</label>
                     <input type="text" class="form-control rounded-pill shadow-sm" name="surname" id="surname" value="{{ data.surname }}">
                     {% if error.surname %}
@@ -53,9 +47,7 @@
                             <p class="text-danger">{{ error.surname }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="birthdate" class="text-muted" style="color: #6c757d;">Birth date:</label>
                     <input type="date" class="form-control rounded-pill shadow-sm" name="birthDate" id="birthDate" value="{{ data.birthDate }}">
                     {% if error.birthDate %}
@@ -63,9 +55,7 @@
                             <p class="text-danger">{{ error.birthDate }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="address" class="text-muted" style="color: #6c757d;">Address:</label>
                     <input type="text" class="form-control rounded-pill shadow-sm" name="address" id="address" value="{{ data.address }}">
                     {% if error.address %}
@@ -73,9 +63,7 @@
                             <p class="text-danger">{{ error.address }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="insurancenumber" class="text-muted" style="color: #6c757d;">Insurance Number:</label>
                     <input type="text" class="form-control rounded-pill shadow-sm" name="insuranceNumber" id="insuranceNumber" value="{{ data.insuranceNumber }}">
                     {% if error.insuranceNumber %}
@@ -83,9 +71,7 @@
                             <p class="text-danger">{{ error.insuranceNumber }}</p>
                         </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
                     <label for="image" class="text-muted" style="color: #6c757d;">Image:</label>
                     <input type="file" class="form-control-file" name="image" id="image">
                 </div>

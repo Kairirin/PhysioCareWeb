@@ -1,7 +1,7 @@
 {% extends "base.njk" %}
 {% block titulo %}Records | List{% endblock %}
 {% block contenido %}
-    <h1>PhysioCare records</h1>
+    <h1>Records</h1>
     {% include "records_search.njk" %}
     <div class="container">
         <table class="table table-hover table-bordered align-middle shadow-sm" style="border-radius: 10px; overflow: hidden;">
@@ -18,14 +18,22 @@
                         <td> {{ record.patient.insuranceNumber }}</td>
                         <td>{{ record.patient.surname }}, {{ record.patient.name }}</td>
                         <td class="text-center">
-                            <a href="/records/{{ record.patient.id }}" class="btn btn-outline-primary btn-sm">View details</a>
-                            <a href="/records/{{ record.patient.id }}/appointments/new" class="btn btn-outline-success btn-sm">Add appointment</a>
-                            <form action="/records/{{ record.patient.id }}" method="post">
-                                <input type="hidden" name="_method" value="delete">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                Delete
-                                </button>
-                            </form>
+                            <ul class="nav flex-row justify-content-center">
+                                <li class="nav-item">
+                                    <a href="/records/{{ record.patient.id }}" class="btn btn-outline-primary btn-sm">View details</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/records/{{ record.patient.id }}/appointments/new" class="btn btn-outline-success btn-sm">Add appointment</a>
+                                </li>
+                                <li class="nav-item">
+                                    <form action="/records/{{ record.patient.id }}" method="post">
+                                        <input type="hidden" name="_method" value="delete">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        Delete
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </td>
                     </tr>
                 {% else %}

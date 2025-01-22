@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
 const multer = require("multer");
 let Physio = require(__dirname + "/../models/physio.js");
 let User = require(__dirname + "/../models/users.js");
@@ -31,12 +32,12 @@ router.get("/", autenticacion, (req, res) => {
 });
 
 //GET FORMULARIO NUEVO FISIO
-router.get("/new", autenticacion, rol("admin"), (req, res) => {
+router.get("/new", autenticacion, rol(["admin"]), (req, res) => {
   res.render("physios_add");
 });
 
 //GET FORMULARIO EDICIÓN FISIO
-router.get("/:id/edit", autenticacion, rol("admin"), (req, res) => {
+router.get("/:id/edit", autenticacion, rol(["admin"]), (req, res) => {
   Physio.findById(req.params.id).then(result => {
     if(result)
         res.render('physio_edit', { physio: result });
@@ -75,12 +76,14 @@ router.get("/:id", autenticacion, (req, res) => {
 });
 
 //POST FISIO
-router.post("/", autenticacion, rol("admin"), upload.single("image"), (req, res) => {
+router.post("/", autenticacion, rol(["admin"]), upload.single("image"), (req, res) => {
   let idUser;
+  const saltRounds = 10;
+  const hash = bcrypt.hashSync(req.body.password, saltRounds);
 
   let newUser = new User({
     login: req.body.login,
-    password: req.body.password,
+    password: hash,
     rol: "physio",
   });
 
@@ -144,7 +147,7 @@ router.post("/", autenticacion, rol("admin"), upload.single("image"), (req, res)
 });
 
 //PUT FISIO //TODO: Hace cosas raras
-router.post("/:id", autenticacion, rol("admin"), upload.single("image"), (req, res) => {
+router.post("/:id", autenticacion, rol(["admin"]), upload.single("image"), (req, res) => {
   let newImage;
   if (req.file) {
     newImage = req.file.filename;
@@ -177,13 +180,12 @@ router.post("/:id", autenticacion, rol("admin"), upload.single("image"), (req, r
     if (error.errors.licenseNumber) {
       errores.licenseNumber = error.errors.licenseNumber.message; //TODO: manualmente controlar que no se repita
     }
-/*     res.redirect("/physios/{{ physio.id }}/edit", { error: errores, physio: req.body }); */
     res.render("physio_edit", { error: errores, physio: req.body });
   });
 });
 
 //DELETE FISIO
-router.delete("/:id", autenticacion, rol("admin"), (req, res) => {
+router.delete("/:id", autenticacion, rol(["admin"]), (req, res) => {
   Physio.findByIdAndDelete(req.params.id)
     .then((result) => {
       if (result) {

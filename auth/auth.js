@@ -2,7 +2,7 @@ const session = require('express-session');
 const User = require(__dirname + '/../models/users');
 
 let autenticacion = (req, res, next) => {
-    if (req.session && req.session.usuario)
+    if (req.session && req.session.login)
         return next();
     else
         res.render('login');

@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
 let User = require(__dirname + '/../models/users.js');
 let router = express.Router();
 
@@ -13,16 +14,19 @@ router.post('/login', (req, res) => {
   User.find()
     .then((result) => {
         if(result) {
-            let existe = result.filter(u => u.login == login);
+            let existe = result.filter(u => u.login == login && u.password == password);
 
-            if(existe.length === 1 && bcrypt.compareSync(password, existe[0].password)){
-                req.session.login = existe.login;
-                req.session.id = existe._id;
-                req.session.rol = existe.rol;
-                res.redirect('/public/index.html');
+            /* if(existe.length === 1 && bcrypt.compareSync(password, existe[0].password)){ */
+            if(existe.length == 1){
+                req.session.login = existe[0].login;
+                req.session.id = existe[0]._id;
+                req.session.rol = existe[0].rol;
+                console.log(req.session);
+                res.redirect('/patients');
             }
-            else 
+            else{
                 res.render("error", {error: "Login no válido"});
+            } 
         }
     })
 });

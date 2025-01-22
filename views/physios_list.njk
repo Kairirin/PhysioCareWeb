@@ -1,7 +1,7 @@
 {% extends "base.njk" %}
 {% block titulo %}Physios | List{% endblock %}
 {% block contenido %}
-    <h1>PhysioCare physios</h1>
+    <h1>Physios</h1>
     {% include "physios_search.njk" %}
 
     <div class="container">
@@ -19,16 +19,24 @@
                         <td> {{ physio.licenseNumber }}</td>
                         <td>{{ physio.surname }}, {{ physio.name }}</td>
                         <td class="text-center">
-                            <a href="/physios/{{ physio.id }}" class="btn btn-outline-primary btn-sm">View details</a>
-                            {% if (session and session.login and session.rol == 'admin') %}
-                            <a href="/physios/{{ physio.id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
-                            <form action="/physios/{{ physio.id }}" method="post">
-                                <input type="hidden" name="_method" value="delete">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                Delete
-                                </button>
-                            </form>
-                        {% endif %}
+                            <ul class="nav flex-row justify-content-center">
+                                    <li class="nav-item">
+                                        <a href="/physios/{{ physio.id }}" class="btn btn-outline-primary btn-sm">View details</a>
+                                    </li>
+                                {% if (session and session.login and session.rol == 'admin') %}
+                                    <li class="nav-item">
+                                        <a href="/physios/{{ physio.id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <form action="/physios/{{ physio.id }}" method="post">
+                                            <input type="hidden" name="_method" value="delete">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            Delete
+                                            </button>
+                                        </form>
+                                    </li>
+                                {% endif %}
+                            </ul>
                         </td>
                     </tr>
                 {% else %}
