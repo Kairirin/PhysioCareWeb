@@ -3,25 +3,25 @@ const mongoose = require('mongoose');
 let physioSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Physio\'s name is mandatory'],
-        minlength: [2, 'Physio\'s name is too short'],
-        maxlength: [50, 'Physio\'s name is too long'],
+        required: [true, 'El nombre es obligatorio'],
+        minlength: [2, 'Longitud mínima: 2 caracteres'],
+        maxlength: [50, 'Longitud máxima: 50 caracteres']
     },
     surname: {
         type: String,
-        required: [true, 'Physio\'s surname is mandatory'],
-        minlength: [2, 'Physio\'s surname is too short'],
-        maxlength: [50, 'Physio\'s surname is too long'],
+        required: [true, 'El apellido es obligatorio'],
+        minlength: [2, 'Longitud mínima: 2 caracteres'],
+        maxlength: [50, 'Longitud máxima: 50 caracteres']
     },
     specialty: {
         type: String,
-        required: [true, 'Physio\'s specialty is mandatory'],
+        required: [true, 'Debes indicar especialidad'],
         enum: ['Sports', 'Neurological', 'Pediatric', 'Geriatric', 'Oncological']
     },
     licenseNumber: {
         type: String,
-        required: [true, 'Physio\'s license number is mandatory'],
-        match: [/^[a-zA-Z0-9]{8}$/, 'Physio\'s license number may only contain eight letters and/or numbers'],
+        required: [true, 'El número de licencia es obligatorio'],
+        match: [/^[a-zA-Z0-9]{8}$/, 'Solo debe incluir 8 letras y/o números'],
         unique: true
     },
     image: {

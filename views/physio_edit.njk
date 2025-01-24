@@ -34,7 +34,15 @@
 
                 <div class="form-group">
                     <label for="specialty" class="text-muted" style="color: #6c757d;">Specialty:</label>
-                    <input type="text" class="form-control rounded-pill shadow-sm" name="specialty" id="specialty" value="{{ physio.specialty }}"> 
+                    <input type="text" class="form-control rounded-pill shadow-sm" disabled value="{{ physio.specialty }}"> 
+                    <select class="form-select rounded-pill shadow-sm" name="specialty" id="speacialty">
+                        <option value="">--</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Neurological">Neurological</option>
+                        <option value="Pediatric">Pediatric</option>
+                        <option value="Geriatric">Geriatric</option>
+                        <option value="Oncological">Oncological</option>
+                    </select>
                     {% if error.specialty %}
                         <div class="mt-2" role="alert">
                             <p class="text-danger">{{ error.specialty }}</p>

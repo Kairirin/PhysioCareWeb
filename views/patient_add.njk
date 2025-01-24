@@ -14,11 +14,7 @@
                 <div class="form-group">
                     <label for="login" class="text-muted" style="color: #6c757d;">Login:</label>
                     <input type="text" class="form-control rounded-pill shadow-sm" name="login" id="login">
-                    {% if error.unique %}
-                        <div class="mt-2" role="alert">
-                            <p class="text-danger">{{ error.unique }}</p>
-                        </div>
-                    {% elseif error.login %}
+                    {% if error.login %}
                         <div class="mt-2" role="alert">
                             <p class="text-danger">{{ error.login }}</p>
                         </div>
@@ -31,7 +27,7 @@
                             <p class="text-danger">{{ error.password }}</p>
                         </div>
                     {% endif %}
-
+                    <hr>
                     <label for="name" class="text-muted" style="color: #6c757d;">Name:</label>
                     <input type="text" class="form-control rounded-pill shadow-sm" name="name" id="name" value="{{ data.name }}">
                     {% if error.name %}

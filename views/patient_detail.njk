@@ -31,8 +31,8 @@
                 <div class="card-footer text-center">
                 {% if (session and session.login and (session.rol == 'admin' or session.rol == 'physio')) %}
                     <a href="/patients/{{ patient.id }}/edit" class="btn btn-primary" style="background-color: #c3b091; border: none; padding: 10px 20px; border-radius: 5px;">Edit patient</a>
-                    {% endif %}
                     <a href="/patients" class="btn btn-primary" style="margin-right: 10px;">Go back</a>
+                {% endif %}
                 </div>
             </div>
         </div>

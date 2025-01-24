@@ -5,7 +5,6 @@ let Physio = require(__dirname + "/../models/physio.js");
 let User = require(__dirname + "/../models/users.js");
 const { autenticacion, rol } = require(__dirname + '/../auth/auth');
 
-
 let router = express.Router();
 
 let storage = multer.diskStorage({
@@ -23,8 +22,8 @@ let upload = multer({ storage: storage });
 router.get("/", autenticacion, (req, res) => {
   Physio.find()
     .then((result) => {
-      if (result) res.render("physios_list", { physios: result });
-      else res.render("error", { error: "No hay fisios en el sistema" });
+      if (result.length > 0) res.render("physios_list", { physios: result });
+      else res.render("error", { error: "No se ha encontrado fisioterapeutas en el sistema." });
     })
     .catch((error) => {
       res.render("error", { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde." });
@@ -39,10 +38,7 @@ router.get("/new", autenticacion, rol(["admin"]), (req, res) => {
 //GET FORMULARIO EDICIÓN FISIO
 router.get("/:id/edit", autenticacion, rol(["admin"]), (req, res) => {
   Physio.findById(req.params.id).then(result => {
-    if(result)
         res.render('physio_edit', { physio: result });
-    else
-        res.render('error', { error: "No se ha encontrado el fisioterapeuta a editar" });
   }).catch (error => {
       res.render('error', { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde." });
   }); 
@@ -55,7 +51,7 @@ router.get("/find", autenticacion, (req, res) => {
       if (result.length > 0) res.render("physios_list", { physios: result });
       else
         res.render("error", {
-          error: "No se encontraron fisioterapeutas con la especialidad indicada",
+          error: "No se encontraron fisioterapeutas con la especialidad indicada.",
         });
     })
     .catch((error) => {
@@ -67,10 +63,8 @@ router.get("/find", autenticacion, (req, res) => {
 router.get("/:id", autenticacion, (req, res) => {
   Physio.findById(req.params.id)
     .then((result) => {
-      if (result) res.render("physio_detail", { physio: result });
-      else res.render("error", { error: "No se ha encontrado el fisio" });
-    })
-    .catch((error) => {
+      res.render("physio_detail", { physio: result });
+    }).catch((error) => {
       res.render("error", { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde." });
     });
 });
@@ -105,59 +99,70 @@ router.post("/", autenticacion, rol(["admin"]), upload.single("image"), (req, re
       physio.save().then(() => {
           res.redirect(req.baseUrl);
         })
-        .catch((error) => {
-          User.findByIdAndDelete(idUser); //TODO: Si no va, poner and remove
+        .catch(async (error) => {
+          await User.findByIdAndDelete(idUser);
 
           let errores = {
-            general: "Error adding physio",
+            general: "Error añadiendo fisioterapeuta",
           };
 
-          if (error.errors.name) {
-            errores.name = error.errors.name.message;
+          if(error.code === 11000){ 
+            if(error.keyPattern.licenseNumber){ 
+                errores.licenseNumber = "El número de licencia debe ser único"; 
+            }
           }
-          if (error.errors.surname) {
-            errores.surname = error.errors.surname.message;
-          }
-          if (error.errors.specialty) {
-            errores.specialty = error.errors.specialty.message;
-          }
-          if (error.errors.licenseNumber) {
-            errores.licenseNumber = error.errors.licenseNumber.message; //TODO: manualmente controlar que no se repita
+          else {
+            if (error.errors.name) {
+              errores.name = error.errors.name.message;
+            }
+            if (error.errors.surname) {
+              errores.surname = error.errors.surname.message;
+            }
+            if (error.errors.specialty) {
+              errores.specialty = error.errors.specialty.message;
+            }
+            if (error.errors.licenseNumber) {
+              errores.licenseNumber = error.errors.licenseNumber.message;
+            }
           }
           res.render("physios_add", { error: errores, data: req.body });
         });
-    })
-    .catch((error) => {
-      let username = User.find({ login: req.body.login });
+    }).catch((error) => {
       let errores = {
-        general: "Error adding user",
+        general: "Error añadiendo usuario",
       };
-      if (username) {
-        errores.unique = "This username is already in use";
-      } else if (error.errors.login) {
-        //TODO: Toda esta parte no va.
-        errores.login = error.errors.login.message;
-      }
 
-      if (error.errors.password) {
-        errores.password = error.errors.password.message;
+      if(error.code === 11000){ 
+        if(error.keyPattern.login)
+            errores.login = "El nombre de usuario introducido ya existe"; 
+      }
+      else {
+        if (error.errors.login) {
+          errores.login = error.errors.login.message;
+        }
+        if (error.errors.password) {
+          errores.password = error.errors.password.message;
+        }
       }
       res.render("physios_add", { error: errores, data: req.body });
     });
 });
 
-//PUT FISIO //TODO: Hace cosas raras
+//PUT FISIO 
 router.post("/:id", autenticacion, rol(["admin"]), upload.single("image"), (req, res) => {
-  let newImage;
+  let newImage, newSpecialty;
   if (req.file) {
     newImage = req.file.filename;
+  }
+  if(req.body.specialty){
+    newSpecialty = req.body.specialty;
   }
 
   Physio.findByIdAndUpdate(req.params.id, {
       $set: {
         name: req.body.name,
         surname: req.body.surname,
-        specialty: req.body.specialty,
+        specialty: newSpecialty,
         licenseNumber: req.body.licenseNumber,
         image: newImage
       },
@@ -166,21 +171,35 @@ router.post("/:id", autenticacion, rol(["admin"]), upload.single("image"), (req,
     res.render("physio_detail", { physio: result });
   }).catch((error) => {
     let errores = {
-      general: "Error editing physio"
+      general: "Error editando fisioterapeuta"
     }
-    if (error.errors.name) {
-      errores.name = error.errors.name.message;
+
+    if(error.code === 11000){ 
+      if(error.keyPattern.licenseNumber){ 
+          errores.licenseNumber = "El número de licencia debe ser único"; 
+      }
     }
-    if (error.errors.surname) {
-      errores.surname = error.errors.surname.message;
+    else {
+      if (error.errors.name) {
+        errores.name = error.errors.name.message;
+      }
+      if (error.errors.surname) {
+        errores.surname = error.errors.surname.message;
+      }
+      if (error.errors.specialty) {
+        errores.specialty = error.errors.specialty.message;
+      }
+      if (error.errors.licenseNumber) {
+        errores.licenseNumber = error.errors.licenseNumber.message;
+      }
     }
-    if (error.errors.specialty) {
-      errores.specialty = error.errors.specialty.message;
-    }
-    if (error.errors.licenseNumber) {
-      errores.licenseNumber = error.errors.licenseNumber.message; //TODO: manualmente controlar que no se repita
-    }
-    res.render("physio_edit", { error: errores, physio: req.body });
+    res.render("physio_edit", { error: errores, physio: {
+      id: req.params.id, 
+      name: req.body.name, 
+      surname: req.body.surname, 
+      specialty: req.body.specialty, 
+      licenseNumber: req.body.licenseNumber
+    } });
   });
 });
 
@@ -188,15 +207,12 @@ router.post("/:id", autenticacion, rol(["admin"]), upload.single("image"), (req,
 router.delete("/:id", autenticacion, rol(["admin"]), (req, res) => {
   Physio.findByIdAndDelete(req.params.id)
     .then((result) => {
-      if (result) {
         User.findByIdAndDelete(req.params.id).then((resultUser) => {
           res.redirect(req.baseUrl);
         });
-      } else 
-        res.render('error', {error: "El fisio a eliminar no existe"});
     })
     .catch((error) => {
-      res.render('error', {error: "El fisio a eliminar no existe"});
+      res.render('error', {error: "El fisioterapeuta a eliminar no existe"});
     });
 });
 

@@ -19,7 +19,7 @@ let rol = (rol) => {
 
 let accesoId = () => {
     return (req, res, next) => {
-        if(req.session.login == "patient" && req.params.id != req.session.id)
+        if(req.session.login == "patient" && req.params.id != req.session.userId)
             res.render('error', { error: "Acceso no autorizado" });
         else
             next();

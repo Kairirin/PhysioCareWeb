@@ -68,8 +68,8 @@
                 <div class="card-footer text-center">
                 {% if (session and session.login and (session.rol == 'admin' or session.rol == 'physio')) %}
                     <a href="/records/{{ record.patient.id }}/appointments/new" class="btn btn-outline-success btn-sm">Add appointment</a>
-                    {% endif %}
                     <a href="/records" class="btn btn-primary" style="margin-right: 10px;">Return</a>
+                {% endif %}
                 </div>
             </div>
         </div>

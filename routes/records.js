@@ -4,7 +4,6 @@ let Patient = require(__dirname + "/../models/patient.js");
 let Physio = require(__dirname + "/../models/physio.js");
 const { autenticacion, rol, accesoId } = require(__dirname + '/../auth/auth');
 
-
 let router = express.Router();
 
 //GET
@@ -12,7 +11,7 @@ router.get("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
     Record.find()
         .populate("patient")
         .then((result) => {
-            if(result)
+            if(result.length > 0)
                 res.render('records_list', {records: result});
             else 
                 res.render('error', { error: "No se encontraron expedientes en el sistema" });
@@ -29,7 +28,9 @@ router.get("/new", autenticacion, rol(["admin", "physio"]), (req, res) => {
 
   //GET FORMULARIO NUEVO APPOINTMENT
 router.get("/:id/appointments/new", autenticacion, rol(["admin", "physio"]), (req, res) => {
-    res.render("record_add_appointment", { id: req.params.id});
+    res.render("record_add_appointment", { data: {
+      id: req.params.id
+    }});
   });
 
 //GET POR APELLIDO DE PACIENTE
@@ -52,13 +53,13 @@ router.get("/find", autenticacion, rol(["admin", "physio"]), (req, res) => {
 
 //GET POR ID DE PACIENTE
 router.get("/:id", autenticacion, rol(["admin", "physio"]), accesoId(), (req, res) => {
-    Record.findOne({patient: req.params.id})
+    Record.findOne({ patient: req.params.id })
         .populate("patient")
-        .then(result => {
-            if(result)
-                res.render('record_detail', { record: result });
-            else 
-                res.render('error', { error: "No se ha encontrado el expediente" });
+        .then((result) => {
+          if(result)
+            res.render('record_detail', { record: result });
+          else  
+            res.render('error', { error: "No existe el expediente de este paciente." }); //TODO: Desde la vista de paciente, si no tiene el expediente creado, no carga la vista de error.
         }).catch((error) => {
             res.render('error', { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde."});
         });
@@ -66,8 +67,7 @@ router.get("/:id", autenticacion, rol(["admin", "physio"]), accesoId(), (req, re
 
 //POST EXPEDIENTE
 router.post("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
-    /* Patient.findById(req.body.patient) */
-    Patient.findOne({insuranceNumber: req.body.patient })
+    Patient.findOne({ insuranceNumber: req.body.patient })
         .then(result => {
             if(result){
                 let record = new Record({
@@ -75,6 +75,7 @@ router.post("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
                     medicalRecord: req.body.medicalRecord,
                     appointments: []
                 });
+                
                 record.save().then((result) => {
                     res.redirect(req.baseUrl);
                   })
@@ -82,11 +83,6 @@ router.post("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
                     let errores = {
                         general: "Error añadiendo expediente",
                       };
-            
-                      if (error.errors.patient) {
-                        /* errores.patient = error.errors.patient.message; */
-                        errores.patient = "Debes añadir paciente";
-                      }
                       if (error.errors.medicalRecord) {
                         errores.medicalRecord = error.errors.medicalRecord.message;
                       }
@@ -95,12 +91,13 @@ router.post("/", autenticacion, rol(["admin", "physio"]), (req, res) => {
             }
             else{
                 let errores = {
-                    general: "No se ha encontrado paciente con esa ID",
+                    general: "Error añadiendo expediente",
+                    patient: "Introduce un paciente válido"
                   };
                 res.render("record_add", { error: errores});
             }
         }).catch(error => {
-            res.render("error", { error: "Error en la base de datos. Inténtelo de nuevo." });
+            res.render("error", { error: "Hubo un problema al procesar la petición. Inténtelo de nuevo." });
         })
   });
 
@@ -109,7 +106,6 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
     Physio.findOne({ licenseNumber: req.body.physio})
         .then((result) => {
             let appointment = new Appointment ({
-                /* date: new Date(req.body.date), */
                 date: req.body.date,
                 physio: result._id,
                 diagnosis: req.body.diagnosis,
@@ -119,26 +115,21 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
         
             Record.findOneAndUpdate({patient: req.params.id},
             {
-                $push: {appointments: appointment} 
-            }, { new: true }
-            ).then(result => {
-                if (result)
+                $push: { appointments: appointment } 
+            }, { new: true, runValidators: true }
+            ).populate("patient")
+            .then((result) => {
                     res.render('record_detail', { record: result });
-                else
-                    res.render("error", { error: "Error en inserción. Inténtelo de nuevo." });
             }).catch((error) => {
-                let errores = {
-                    general: "Error adding appointment",
+                let errores = { //TODO: No hace nada de validación. Comprobar bien este método cuando corrija la validación
+                    general: "Error añadiendo consulta",
                   };
-            
                   if (error.errors.date) {
                     errores.date = error.errors.date.message;
                   }
-                  
                   if (error.errors.physio) {
                     errores.physio = error.errors.physio.message;
                   }
-
                   if (error.errors.diagnosis) {
                     errores.diagnosis = error.errors.diagnosis.message;
                   }
@@ -148,14 +139,28 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
                   if (error.errors.observations) {
                     errores.observations = error.errors.observations.message;
                   }
-                  res.render("record_add_appointment", { error: errores, data: req.body }); //TODO: La segunda vez que da error redirige al formulario de añadir y no sé porqué. Va eliminando cosas de la uri
+                  res.render("record_add_appointment", { error: errores, data: {
+                    id: req.params.id,
+                    date: req.body.date, 
+                    physio: req.body.physio, 
+                    diagnosis: req.body.diagnosis, 
+                    treatment: req.body.treatment, 
+                    observations: req.body.observations
+                  } });
                 });
         }).catch(() => {
             let errores = {
-                general: "Error adding appointment",
-                physio: "El fisio  no existe"
+                general: "Error añadiendo consulta",
+                physio: "Debe introducir un fisioterapeuta válido"
               };
-            res.render("record_add_appointment", { error: errores, data: req.body });
+            res.render("record_add_appointment", { error: errores, data: {
+              id: req.params.id,
+              date: req.body.date, 
+              physio: req.body.physio, 
+              diagnosis: req.body.diagnosis, 
+              treatment: req.body.treatment, 
+              observations: req.body.observations
+            } });
         })
 })
 
@@ -163,13 +168,9 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
 router.delete("/:id", autenticacion, rol(["admin", "physio"]), (req, res) => {
     Record.findOneAndDelete({patient: req.params.id})
       .then((result) => {
-        if (result)
             res.redirect(req.baseUrl);
-        else
-            res.render('error', {error: "El expediente a eliminar no existe"});
-      })
-      .catch((error) => {
-        res.render('error', {error: "Error en el servidor. Inténtalo más tarde"});
+      }).catch((error) => {
+        res.render('error', {error: "Error en la petición. Inténtalo más tarde"});
       });
   });
 

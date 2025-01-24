@@ -58,3 +58,13 @@ app.get('/', (req, res) => {
   });
 
 app.listen(process.env.PUERTO);
+
+/* 
+CREDENCIALES:
+admin: admin0
+contraseña: wiwi
+
+physio: bestFisio
+contraseña: wiwi
+
+*/

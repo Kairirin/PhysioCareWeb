@@ -1,24 +1,3 @@
-{# <div class="alert alert-secondary d-flex gap-3">
-    {% include "patients_search.njk" %}
-    {% include "physios_search.njk" %}
-    {% include "records_search.njk" %}
-    {% if (session and session.login and session.rol == 'admin') %}
-        <a href="/physios/new" class="btn btn-dark">New physio</a>
-    {% endif %}
-    {% if (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
-        <a href="/patients/new" class="btn btn-dark">New patient</a>
-        <a href="/records/new" class="btn btn-dark">New record</a>
-    {% endif %}
-    {% if (session and session.usuario) %}
-        <a href="/patients" class="btn btn-dark">Patients</a>
-        <a href="/physios" class="btn btn-dark">Physios</a>
-        <a href="/records" class="btn btn-dark">Records</a>
-        <a class="btn btn-dark" href="/auth/logout">Logout</a>
-    {% else %}
-        <a class="btn btn-dark" href="/auth/login">Login</a>
-    {% endif %}
-</div> #}
-
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">PhysioCare</a>
@@ -33,10 +12,13 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
+                        {% if (session and session.login and(session.rol == 'patient'))%}
+                            <a class="dropdown-item" href="/patients/{{ session.userId }}">See your data</a>
+                        </li>
+                        {% elseif (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
                             <a class="dropdown-item" href="/patients">See list</a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        {% if (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
                             <li>
                                 <a class="dropdown-item" href="/patients/new">New patient</a>
                             </li>
@@ -64,11 +46,15 @@
                         Records
                     </a>
                     <ul class="dropdown-menu">
+                        {% if (session and session.login and(session.rol == 'patient'))%}
+                        <li>
+                            <a class="dropdown-item" href="/records/{{ session.userId }}">See your record</a>
+                        </li>
+                        {% elseif (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
                         <li>
                             <a class="dropdown-item" href="/records">See list</a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        {% if (session and session.login and(session.rol == 'admin' or session.rol == 'physio')) %}
                             <li>
                                 <a class="dropdown-item" href="/records/new">New record</a>
                             </li>
