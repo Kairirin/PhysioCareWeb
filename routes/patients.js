@@ -149,7 +149,7 @@ router.post("/", autenticacion, rol(["admin", "physio"]), upload.single("image")
         errores.login = error.errors.login.message;
       }
       if (error.errors.password) {
-        errores.password = error.errors.password.message; //TODO: No hace esta validación, y en Fisio tampoco
+        errores.password = error.errors.password.message;
       }
     }
     res.render("patient_add", { error: errores, data: req.body });

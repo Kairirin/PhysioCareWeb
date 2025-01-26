@@ -52,14 +52,14 @@ router.get("/find", autenticacion, rol(["admin", "physio"]), (req, res) => {
 });
 
 //GET POR ID DE PACIENTE
-router.get("/:id", autenticacion, rol(["admin", "physio"]), accesoId(), (req, res) => {
+router.get("/:id", autenticacion, rol(["admin", "physio", "patient"]), accesoId(), (req, res) => {
     Record.findOne({ patient: req.params.id })
         .populate("patient")
         .then((result) => {
           if(result)
             res.render('record_detail', { record: result });
           else  
-            res.render('error', { error: "No existe el expediente de este paciente." }); //TODO: Desde la vista de paciente, si no tiene el expediente creado, no carga la vista de error.
+            res.render('error', { error: "No existe el expediente de este paciente." });
         }).catch((error) => {
             res.render('error', { error: "Hubo un problema al procesar la búsqueda. Inténtalo más tarde."});
         });
@@ -112,16 +112,18 @@ router.post('/:id/appointments', autenticacion, rol(["admin", "physio"]), (req, 
                 treatment: req.body.treatment,
                 observations: req.body.observations
             });
-        
-            Record.findOneAndUpdate({patient: req.params.id},
-            {
-                $push: { appointments: appointment } 
-            }, { new: true, runValidators: true }
-            ).populate("patient")
-            .then((result) => {
-                    res.render('record_detail', { record: result });
+
+            appointment.validate().then((result) => {
+              Record.findOneAndUpdate({patient: req.params.id},
+                {
+                    $push: { appointments: appointment } 
+                }, { new: true, runValidators: true }
+                ).populate("patient")
+                .then((result) => {
+                        res.render('record_detail', { record: result });
+                })
             }).catch((error) => {
-                let errores = { //TODO: No hace nada de validación. Comprobar bien este método cuando corrija la validación
+                let errores = {
                     general: "Error añadiendo consulta",
                   };
                   if (error.errors.date) {

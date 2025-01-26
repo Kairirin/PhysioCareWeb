@@ -43,8 +43,7 @@
 
                 <div class="form-group">
                     <label for="treatment" class="text-muted" style="color: #6c757d;">Treatment:</label>
-                    <textarea class="form-control rounded-pill shadow-sm" name="treatment" id="treatment" value="{{ data.treatment }}">
-                    </textarea>
+                    <input type="text" class="form-control rounded-pill shadow-sm" name="treatment" id="treatment" value="{{ data.treatment }}">
                     {% if error.treatment %}
                         <div class="mt-2" role="alert">
                             <p class="text-danger">{{ error.treatment }}</p>
